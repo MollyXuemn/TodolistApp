@@ -1,5 +1,7 @@
 package io.takima.todolist.controller;
 
+import io.takima.todolist.controller.response.TodoCreationDTO;
+import io.takima.todolist.controller.response.TodoUpdateDTO;
 import io.takima.todolist.models.TodoItem;
 import io.takima.todolist.services.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,23 +31,24 @@ public class TodolistApi {
                 .orElseThrow(() -> new NoSuchElementException(String.format("no todoItem with id %d", id)));
         return  todoService.findById(id);
     }
-    @PostMapping(value = "/{id}")
-    public TodoItem create(@RequestBody() TodoItem item) {
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<TodoCreationDTO> create(@RequestBody() TodoItem item) {
         if (item.getId() != null) {
             throw new IllegalArgumentException("cannot create an item and specify the ID");
         }
-        return todoService.save(item);
-//        return new ResponseEntity<>(assembler.toModel(article), HttpStatus.CREATED);
+        return ResponseEntity.ok(TodoCreationDTO.fromModel(todoService.save(item)));
     }
-    @PutMapping(value = "/{id}")
-    public TodoItem update(@RequestBody() TodoItem item) {
+    @PutMapping
+    public ResponseEntity<TodoUpdateDTO> update(@RequestBody() TodoItem item) {
         if (item.getId() == null) {
             throw new IllegalArgumentException("did not specify the ID of item to update");
         }
-        return todoService.save(item);
+        return ResponseEntity.ok(TodoUpdateDTO.fromModel(todoService.save(item)));
     }
 
     @DeleteMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long id) {
         todoService.delete(id);
     }

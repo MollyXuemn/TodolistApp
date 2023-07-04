@@ -23,47 +23,60 @@ public class TodoItem {
     @Column
     Boolean isDone;
 
-    public TodoItem(Long id, String title, String description, LocalDateTime createdAt, LocalDateTime lastModified) {
+    public TodoItem(Long id, String title, String description, LocalDateTime createdAt, LocalDateTime lastModified, Boolean isDone) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.createdAt = createdAt;
         this.lastModified = lastModified;
+        this.isDone = isDone;
     }
 
     public TodoItem() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getLastModified() {
-        return lastModified;
-    }
-
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
+
     public void setLastModified(LocalDateTime lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public Boolean getDone() {
+        return isDone;
     }
 
     public void setDone(Boolean done) {
@@ -85,11 +98,4 @@ public class TodoItem {
         return id != null ? id.hashCode() : 0;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
 }
