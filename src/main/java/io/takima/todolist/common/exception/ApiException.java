@@ -14,8 +14,7 @@ public class ApiException extends RuntimeException{
                         @Nullable String code,
                         @Nullable HttpHeaders headers,
                         @Nullable Object data) {
-        this(cause, ExceptionEntity
-                .builder()
+        this(cause, new ExceptionEntity.Builder()
                 .message(message)
                 .status(status)
                 .code(code)
