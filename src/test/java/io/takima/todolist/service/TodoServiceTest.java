@@ -1,7 +1,7 @@
 package io.takima.todolist.service;
 
 import io.takima.todolist.models.TodoItem;
-import io.takima.todolist.repositories.TodoRepository;
+import io.takima.todolist.repositories.impl.TodoRepository;
 import io.takima.todolist.services.TodoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

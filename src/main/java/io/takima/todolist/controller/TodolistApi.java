@@ -1,10 +1,17 @@
 package io.takima.todolist.controller;
 
+import io.takima.todolist.common.pagination.PageSearch;
+import io.takima.todolist.common.pagination.SearchSpecification;
 import io.takima.todolist.controller.response.TodoCreationDTO;
 import io.takima.todolist.controller.response.TodoUpdateDTO;
 import io.takima.todolist.models.TodoItem;
 import io.takima.todolist.services.TodoService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,15 +22,23 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/todo-items")
+@AllArgsConstructor
 public class TodolistApi {
     private final TodoService todoService;
-    @Autowired
-    public TodolistApi(TodoService todoService) {
-        this.todoService = todoService;
-    }
     @GetMapping
-    public List<TodoItem> findAll(){
-        return todoService.findAll();
+    public Page<TodoItem> findAll(
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(required = false) String search,
+            @SortDefault Sort sort
+    ){
+        Specification<TodoItem> spec = (search != null) ? SearchSpecification.parse(search) : Specification.where(null);
+        return todoService.findAll(new PageSearch.Builder<TodoItem>()
+                .limit(limit)
+                .offset(offset)
+                .search(spec)
+                .sort(sort).build());
+
     }
     @GetMapping(value = "/{id}")
     public Optional<TodoItem> getOne(@PathVariable long id) {

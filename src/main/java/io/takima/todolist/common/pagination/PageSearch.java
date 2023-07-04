@@ -1,6 +1,7 @@
 package io.takima.todolist.common.pagination;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +20,7 @@ public class PageSearch <T> implements Pageable{
         this.search = search;
         this.sort = sort;
     }
+
     public PageSearch(PageSearch pageSearch, Specification<T> search) {
         this(
                 pageSearch.limit,
@@ -73,6 +75,42 @@ public class PageSearch <T> implements Pageable{
 
     public boolean hasPrevious() {
         return false;
+    }
+    public static <T> Builder<T> builder() {
+        return new Builder<>();
+    }
+    public static class Builder<T> {
+        private int limit;
+        private int offset;
+        private Specification<T> search;
+        private Sort sort;
+
+        public Builder() {
+        }
+
+        public Builder<T> limit(int limit) {
+            this.limit = limit;
+            return this;
+        }
+
+        public Builder<T> offset(int offset) {
+            this.offset = offset;
+            return this;
+        }
+
+        public Builder<T> search(Specification<T> search) {
+            this.search = search;
+            return this;
+        }
+
+        public Builder<T> sort(Sort sort) {
+            this.sort = sort;
+            return this;
+        }
+
+        public PageSearch<T> build() {
+            return new PageSearch<>(limit, offset, search, sort);
+        }
     }
 
 }

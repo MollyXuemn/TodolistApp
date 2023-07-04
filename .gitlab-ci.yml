@@ -56,7 +56,7 @@ backend:package:
       --cache=true
 
 
-staging:
+.staging:
   stage: deploy
   variables:
     TAG: '$CI_COMMIT_REF_NAME'
