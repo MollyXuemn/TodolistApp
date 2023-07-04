@@ -1,6 +1,7 @@
 package io.takima.todolist.service;
 
 import io.takima.todolist.models.TodoItem;
+import io.takima.todolist.repositories.TodoDao;
 import io.takima.todolist.repositories.impl.TodoRepository;
 import io.takima.todolist.services.TodoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,10 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TodoServiceTest {
     @Mock
     TodoRepository todoRepository;
-    TodoService todoService = new TodoService(todoRepository);
+    TodoDao todoDao;
+    TodoService todoService = new TodoService(todoRepository, todoDao);
     @BeforeEach
     void setUp() {
-        todoService = new TodoService(todoRepository);
+        todoService = new TodoService(todoRepository, todoDao);
     }
     @DisplayName("method 'getForCustomer(Long)'")
     @Nested
