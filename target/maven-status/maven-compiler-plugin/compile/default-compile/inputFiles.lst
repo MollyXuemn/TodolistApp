@@ -1,2 +1,12 @@
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/controller/TodolistApi.java
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/services/TodoService.java
 /home/takima/Documents/todolist/src/main/java/io/takima/todolist/models/TodoItem.java
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/controller/response/TodoUpdateDTO.java
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/common/dto/ExceptionEntity.java
 /home/takima/Documents/todolist/src/main/java/io/takima/todolist/ToDoListApp.java
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/repositories/TodoRepository.java
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/controller/response/TodoCreationDTO.java
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/common/exception/ApiExceptionHandler.java
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/common/exception/AppExceptionHandler.java
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/common/pagination/PageSearch.java
+/home/takima/Documents/todolist/src/main/java/io/takima/todolist/common/exception/ApiException.java
