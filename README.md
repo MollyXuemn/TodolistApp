@@ -3,8 +3,6 @@
 ![Global Process Overview][process-overview]
 
 
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 ### Built With
 
 * [Spring](https://spring.io)
@@ -32,9 +30,9 @@ project
    ```shell
    git@gitlab.takima.io:mxue/todolist.git
    ```
-2. Configure the project by running the setup script
+2. Configure the project by 
    ```shell
-   
+   sample.env
    ```
    ⚠ Warning ⚠
 
@@ -55,20 +53,14 @@ project
 
 4. Build and run the project (With Docker)
 
-   You can start only the api with the attached database by running
-   ```shell
-  
-   ```
-   Or you can start the whole TakimaCert project by running
-   ```shell
-   
-   ```
-   (by the way you can directly give `-n` or `-y` params to skip the build-kit activation question)
+   You can start only the api with the attached database by clicking the `run` button in 
+   `ToDoListApp`
+   You can test all your endpoints in Postman which give you all the corresponding status responses.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+5. Build and run the test
 
-<!-- Mailjet -->
-
+   You can run the unit test and integration test to verify that the 
+   CRUD method in the TodolistApi class listens to a certain HTTP request 
 
 ## Contact
 
