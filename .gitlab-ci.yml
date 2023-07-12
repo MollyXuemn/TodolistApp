@@ -1,0 +1,104 @@
+variables:
+  MAVEN_IMAGE: 'maven:3.9.0-amazoncorretto-19'
+  KANIKO_IMAGE: "gcr.io/kaniko-project/executor:debug"
+  DOCKER_IMAGE: 'docker:20.10.21'
+  DOCKER_IN_DOCKER_IMAGE: ${DOCKER_IMAGE}-dind
+
+
+
+stages:
+  - build
+  - test
+  - package
+  - deploy
+
+include: /generic-config-template.yml
+
+backend:build:
+  image: $MAVEN_IMAGE
+  stage: build
+  extends: .backend_cache_config
+  #artifacts:
+  #  paths:
+  #    - target/*.jar
+  #  expire_in: 1h
+  script:
+    - mvn package -DskipTests
+
+backend:test:
+  image: $MAVEN_IMAGE
+  stage: test
+  needs: [ ]
+  services:
+    - $DOCKER_IN_DOCKER_IMAGE
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_DRIVER: "overlay2"
+    DOCKER_TLS_CERTDIR: ''
+  script:
+    - mvn verify
+  extends: .backend_cache_config
+  cache:
+    policy: pull
+
+backend:package:
+  extends: .common_package_config
+  needs: [ "backend:build" ]
+  cache:
+    policy: pull
+  dependencies:
+    - backend:build
+  script:
+    - /kaniko/executor
+      --context "$CI_PROJECT_DIR"
+      --dockerfile "$CI_PROJECT_DIR/Dockerfile"
+      --destination "$CI_REGISTRY_IMAGE/app:${CI_COMMIT_TAG:-latest}"
+      --cache=true
+
+
+.staging:
+  stage: deploy
+  variables:
+    TAG: '$CI_COMMIT_REF_NAME'
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $STAGING_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+  script:
+    # Copying compose files over the server (we don't need the whole Git repo)
+    - scp -P 22 -r docker-compose.yml db rocky@$STAGING_HOST:~
+    - scp -P 22 $STAGING_ENV rocky@$STAGING_HOST:~/.env
+    - ssh rocky@$STAGING_HOST "echo TAG=$TAG >> .env"
+    # Deployment
+    - ssh rocky@$STAGING_HOST "docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+    - ssh rocky@$STAGING_HOST "docker compose pull"
+    - ssh rocky@$STAGING_HOST "docker compose up -d --force-recreate --no-build"
+
+#...
+.prod:
+  stage: deploy
+  variables:
+    TAG: '$CI_COMMIT_REF_NAME'
+  before_script:
+    - 'which ssh-agent || ( apk update && apk add openssh-client )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PROD_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $PROD_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    # Copying compose files over the server (we don't need the whole Git repo)
+    - scp -P 22 -r docker-compose.yml db rocky@$PROD_HOST:~
+    - scp -P 22 $PROD_ENV rocky@$PROD_HOST:~/.env
+    - ssh rocky@$PROD_HOST "echo TAG=$TAG >> .env"
+    # Deployment
+    - ssh rocky@$PROD_HOST "docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+    - ssh rocky@$PROD_HOST "docker compose pull"
+    - ssh rocky@$PROD_HOST "docker compose up -d --force-recreate --no-build"
+
