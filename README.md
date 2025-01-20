@@ -77,7 +77,7 @@ project
 
 ## Contact
 
-- Meini Xue- [mxue@takima.fr](mailto:mxue@takima.fr)
+- Molly Xue- [molly504954366@gmail.com](mailto:molly504954366@gmail.com)
 - 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
