@@ -1,32 +1,58 @@
-version: "3.9"
+name: molly-todolist
 services:
   postgres:
-    image: postgres:14-alpine
+    image: postgres:latest
+    container_name: postgres
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ON_ERROR_STOP=1
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - 'postgres_data:/var/lib/postgresql/data'
+    ports:
+      - '5433:5432'
     networks:
-      - network
+      - app-network
     restart: unless-stopped
+    healthcheck:
+      interval: 2s
+      timeout: 30s
+      retries: 10
+      test: [ 'CMD-SHELL', "pg_isready -U '${POSTGRES_USER}' -d '${POSTGRES_DB}'" ]
 
   flyway:
-    image: flyway/flyway:9-alpine
-    command: -connectRetries=60 -baselineVersion="0.0" baseline migrate info
+    image: 'flyway/flyway:11.2.0'
+    container_name: todolist-db-flyway-clean-migrate
+    build: .
+    command: '-baselineVersion="0.0" baseline migrate info'
     volumes:
-      - ../flyway/sql:/flyway/sql:ro
+      - './flyway/sql:/flyway/sql:ro'
     environment:
-      - FLYWAY_URL=${DB_URL}
-      - FLYWAY_USER=${POSTGRES_USER}
-      - FLYWAY_PASSWORD=${POSTGRES_PASSWORD}
+      FLYWAY_URL: 'jdbc:postgresql://postgres:5432/${POSTGRES_DB}'
+      FLYWAY_USER: '${POSTGRES_USER}'
+      FLYWAY_PASSWORD: '${POSTGRES_PASSWORD}'
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
-      - network
-
+      - app-network
+#  app:
+#    image: '${CGISTRY_IMAGE}/app:${TAG:-latest}'
+##    container_name: appI_RE
+#    environment:
+#      SPRING_DATASOURCE_URL: 'jdbc:postgresql://postgres:5432/${POSTGRES_DB}'
+#      SPRING_DATASOURCE_USERNAME: '${POSTGRES_USER}'
+#      SPRING_DATASOURCE_PASSWORD: '${POSTGRES_PASSWORD}'
+#    ports:
+#      - '8080:8080'
+#    depends_on:
+#      - postgres
+#    networks:
+#      - app-network
 volumes:
-  postgres:
+  postgres_data: null
 networks:
-  network:
+  app-network: null

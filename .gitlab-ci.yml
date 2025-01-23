@@ -1,9 +1,8 @@
 variables:
-  MAVEN_IMAGE: 'maven:3.9.0-amazoncorretto-19'
+  MAVEN_IMAGE: 'maven:amazoncorretto'
   KANIKO_IMAGE: "gcr.io/kaniko-project/executor:debug"
-  DOCKER_IMAGE: 'docker:20.10.21'
+  DOCKER_IMAGE: 'docker:latest'
   DOCKER_IN_DOCKER_IMAGE: ${DOCKER_IMAGE}-dind
-
 
 
 stages:
@@ -74,7 +73,7 @@ backend:package:
     - scp -P 22 -r docker-compose.yml db rocky@$STAGING_HOST:~
     - scp -P 22 $STAGING_ENV rocky@$STAGING_HOST:~/.env
     - ssh rocky@$STAGING_HOST "echo TAG=$TAG >> .env"
-    # Deployment
+    # Deployment in the staging server
     - ssh rocky@$STAGING_HOST "docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
     - ssh rocky@$STAGING_HOST "docker compose pull"
     - ssh rocky@$STAGING_HOST "docker compose up -d --force-recreate --no-build"
