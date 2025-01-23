@@ -1,14 +1,14 @@
 ## Build image
-FROM maven:3.9.0-amazoncorretto-19 AS maven
+FROM maven:3.9.4-amazoncorretto-21 AS maven
 WORKDIR /tmp/build
-COPY ./pom.xml .
+COPY ./pom.xml ./
 RUN mvn dependency:go-offline
-COPY . .
+COPY . ./
 RUN mvn package -DskipTests
 
-  ## run image
-FROM amazoncorretto:19-alpine
-WORKDIR /takima-store
-COPY --from=maven /tmp/build/target/*.jar /todolist/app.jar
+## Run image
+FROM amazoncorretto:21-alpine
+WORKDIR /app
+COPY --from=maven /tmp/build/target/*.jar ./app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -32,7 +32,7 @@ project
    ```
 2. Configure the project by 
    ```shell
-   sample.env
+   .env
    ```
    ⚠ Warning ⚠
 
